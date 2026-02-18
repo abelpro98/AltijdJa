@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Altijd Ja</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 120px;
+    }
+
+    input {
+      padding: 8px;
+      font-size: 16px;
+      width: 280px;
+    }
+
+    button {
+      padding: 8px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #statusText {
+      margin-top: 22px;
+      font-size: 18px;
+      min-height: 24px;
+    }
+
+    /* Progress bar container */
+    .progress-wrap {
+      width: 320px;
+      height: 14px;
+      background: #eee;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 14px auto 10px auto;
+      border: 1px solid #ddd;
+    }
+
+    /* The moving bar */
+    #progressBar {
+      width: 0%;
+      height: 100%;
+      background: #4CAF50;
+      transition: width 0.25s linear;
+    }
+
+    /* Two-step indicators */
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      width: 320px;
+      margin: 0 auto;
+      font-size: 12px;
+      color: #666;
+      user-select: none;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ccc;
+    }
+
+    .dot.active {
+      background: #4CAF50;
+    }
+
+    #antwoord {
+      margin-top: 26px;
+      font-size: 32px;
+      font-weight: bold;
+      color: green;
+      min-height: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Stel je vraag</h1>
+
+  <input id="vraag" placeholder="Typ je vraag hier">
+  <button id="knop" onclick="start()">Vraag!</button>
+
+  <div id="statusText"></div>
+
+  <div class="progress-wrap" id="progressWrap" style="display:none;">
+    <div id="progressBar"></div>
+  </div>
+
+  <div class="steps" id="steps" style="display:none;">
+    <div class="step">
+      <span class="dot" id="dot1"></span>
+      <span>Stap 1</span>
+    </div>
+    <div class="step">
+      <span class="dot" id="dot2"></span>
+      <span>Stap 2</span>
+    </div>
+  </div>
+
+  <div id="antwoord"></div>
+
+  <script>
+    function randomInt(min, max) {
+      // Inclusief min en max
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function start() {
+      const knop = document.getElementById('knop');
+      const statusText = document.getElementById('statusText');
+      const antwoordDiv = document.getElementById('antwoord');
+
+      const progressWrap = document.getElementById('progressWrap');
+      const steps = document.getElementById('steps');
+      const progressBar = document.getElementById('progressBar');
+
+      const dot1 = document.getElementById('dot1');
+      const dot2 = document.getElementById('dot2');
+
+      // Reset UI
+      antwoordDiv.textContent = "";
+      statusText.textContent = "";
+      progressBar.style.width = "0%";
+      dot1.classList.remove("active");
+      dot2.classList.remove("active");
+
+      // Disable knop en toon progress UI
+      knop.disabled = true;
+      progressWrap.style.display = "block";
+      steps.style.display = "flex";
+
+      // Totale denktijd 2–4 seconden
+      const totaal = randomInt(2000, 4000);
+
+      // Verdeel in twee fases (beide minimaal 700ms zodat je het ziet)
+      const fase1 = randomInt(700, totaal - 700);
+      const fase2 = totaal - fase1;
+
+      // Fase 1: 0% -> 50%
+      statusText.textContent = "Analyseert vraag…";
+      dot1.classList.add("active");
+      progressBar.style.width = "50%";
+      await sleep(fase1);
+
+      // Fase 2: 50% -> 100%
+      statusText.textContent = "Raadpleegt universum…";
+      dot2.classList.add("active");
+      progressBar.style.width = "100%";
+      await sleep(fase2);
+
+      // Klaar
+      statusText.textContent = "";
+      progressWrap.style.display = "none";
+      steps.style.display = "none";
+      antwoordDiv.textContent = "JA";
+
+      knop.disabled = false;
+    }
+  </script>
+
+</body>
+</html>
